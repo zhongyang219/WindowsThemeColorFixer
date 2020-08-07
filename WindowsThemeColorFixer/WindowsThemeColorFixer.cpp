@@ -39,6 +39,20 @@ CWindowsThemeColorFixerApp theApp;
 
 BOOL CWindowsThemeColorFixerApp::InitInstance()
 {
+#ifndef _DEBUG
+    //检查是否已有实例正在运行
+    HANDLE hMutex = ::CreateMutex(NULL, TRUE, _T("WindowsThemeColorFixer-LXyKFwXObQB7iCQJ"));
+    if (hMutex != NULL)
+    {
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            SHMessageBoxCheck(NULL, _T("已经有一个程序正在运行！"), NULL, MB_OK | MB_ICONWARNING, IDOK, _T("dznkvc7u3iaw7yanrmf9rxks8kufzlwr"));
+            return FALSE;
+        }
+    }
+#endif
+
+
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(NULL, path, MAX_PATH);
     m_module_path = path;
