@@ -129,7 +129,7 @@ void CWindowsThemeColorFixerDlg::LoadConfig()
     m_auto_adjust_color = (theApp.GetProfileInt(_T("config"), _T("auto_adjust_color"), 1) != 0);
     m_hide_main_window_when_start = (theApp.GetProfileInt(_T("config"), _T("hide_main_window_when_start"), 0) != 0);
     m_adjust_only_light_mode = (theApp.GetProfileInt(_T("config"), _T("adjust_only_light_mode"), 0) != 0);
-    m_enhanced_mode = (theApp.GetProfileInt(_T("config"), _T("enhanced_mode"), 0) != 0);
+    m_enhanced_mode = (theApp.GetProfileInt(_T("config"), _T("enhanced_mode"), 1) != 0);
 }
 
 void CWindowsThemeColorFixerDlg::SaveConfig() const
