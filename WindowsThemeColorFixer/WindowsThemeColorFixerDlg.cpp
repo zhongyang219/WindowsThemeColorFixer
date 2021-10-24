@@ -9,6 +9,7 @@
 #include "Common.h"
 #include "ColorConvert.h"
 #include <strsafe.h>
+#include "WindowsThemeColorApi.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -117,6 +118,7 @@ BEGIN_MESSAGE_MAP(CWindowsThemeColorFixerDlg, CDialog)
     ON_WM_QUERYENDSESSION()
     ON_BN_CLICKED(IDC_AUTO_RUN_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedAutoRunCheck)
     ON_BN_CLICKED(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedAdjustOnlyLightModeCheck)
+    ON_BN_CLICKED(IDC_ENHANCED_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedEnhancedCheck)
 END_MESSAGE_MAP()
 
 
@@ -127,6 +129,7 @@ void CWindowsThemeColorFixerDlg::LoadConfig()
     m_auto_adjust_color = (theApp.GetProfileInt(_T("config"), _T("auto_adjust_color"), 1) != 0);
     m_hide_main_window_when_start = (theApp.GetProfileInt(_T("config"), _T("hide_main_window_when_start"), 0) != 0);
     m_adjust_only_light_mode = (theApp.GetProfileInt(_T("config"), _T("adjust_only_light_mode"), 0) != 0);
+    m_enhanced_mode = (theApp.GetProfileInt(_T("config"), _T("enhanced_mode"), 0) != 0);
 }
 
 void CWindowsThemeColorFixerDlg::SaveConfig() const
@@ -134,6 +137,7 @@ void CWindowsThemeColorFixerDlg::SaveConfig() const
     theApp.WriteProfileInt(L"config", L"auto_adjust_color", m_auto_adjust_color);
     theApp.WriteProfileInt(L"config", L"hide_main_window_when_start", m_hide_main_window_when_start);
     theApp.WriteProfileInt(L"config", L"adjust_only_light_mode", m_adjust_only_light_mode);
+    theApp.WriteProfileInt(L"config", L"enhanced_mode", m_enhanced_mode);
 }
 
 bool CWindowsThemeColorFixerDlg::AdjustWindowsThemeColor()
@@ -141,10 +145,10 @@ bool CWindowsThemeColorFixerDlg::AdjustWindowsThemeColor()
     if (m_adjust_only_light_mode && !CCommon::IsAppLightTheme())
         return false;
 
-    COLORREF color = CCommon::GetWindowsThemeColor();
+    COLORREF color = GetThemeColor();
     if (CColorConvert::IncreaseLuminance(color))
     {
-        CCommon::SetWindowsThemeColor(color);
+        SetThemeColor(color);
         return true;
     }
 
@@ -155,6 +159,29 @@ void CWindowsThemeColorFixerDlg::SetOpaque(int opaque)
 {
     SetWindowLong(m_hWnd, GWL_EXSTYLE, GetWindowLong(m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
     SetLayeredWindowAttributes(0, opaque * 255 / 100, LWA_ALPHA);  //透明度取值范围为0~255
+}
+
+COLORREF CWindowsThemeColorFixerDlg::GetThemeColor()
+{
+    COLORREF color{};
+    if (m_enhanced_mode)
+        color = WindowsThemeColorApi::GetAccentColor();
+    else
+        color = m_dwm_lib.GetWindowsThemeColor();
+    return color;
+}
+
+void CWindowsThemeColorFixerDlg::SetThemeColor(COLORREF color)
+{
+    if (m_enhanced_mode)
+    {
+        WindowsThemeColorApi::SetAccentColor(color);
+    }
+    else
+    {
+        m_dwm_lib.SetWindowsThemeColor(color);
+        CCommon::SetWindowsThemeColor(color);
+    }
 }
 
 BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
@@ -195,6 +222,7 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
 	((CButton*)GetDlgItem(IDC_HIDE_MAIN_WINDOW_CHECK))->SetCheck(m_hide_main_window_when_start);
 	((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->SetCheck(theApp.GetAutoRun());
     CheckDlgButton(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, m_adjust_only_light_mode);
+    CheckDlgButton(IDC_ENHANCED_CHECK, m_enhanced_mode);
 #ifndef _DEBUG
     GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 #endif
@@ -450,4 +478,11 @@ void CWindowsThemeColorFixerDlg::OnBnClickedAdjustOnlyLightModeCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
     m_adjust_only_light_mode = (IsDlgButtonChecked(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK) != 0);
+}
+
+
+void CWindowsThemeColorFixerDlg::OnBnClickedEnhancedCheck()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    m_enhanced_mode = (IsDlgButtonChecked(IDC_ENHANCED_CHECK) != 0);
 }

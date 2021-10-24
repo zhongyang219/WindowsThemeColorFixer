@@ -25,6 +25,9 @@
     <Filter Include="公共的类\WindowsThemeColorApi">
       <UniqueIdentifier>{d37996ae-2b5d-4c63-8638-a90256031299}</UniqueIdentifier>
     </Filter>
+    <Filter Include="公共的类\DwmColorLibrary">
+      <UniqueIdentifier>{352fa9aa-01fe-4430-a9cc-b969ccf6f829}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowsThemeColorFixer.h">
@@ -51,6 +54,9 @@
     <ClInclude Include="WindowsThemeColorApi.h">
       <Filter>公共的类\WindowsThemeColorApi</Filter>
     </ClInclude>
+    <ClInclude Include="DwmColorLibrary.h">
+      <Filter>公共的类\DwmColorLibrary</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsThemeColorFixer.cpp">
@@ -70,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="WindowsThemeColorApi.cpp">
       <Filter>公共的类\WindowsThemeColorApi</Filter>
+    </ClCompile>
+    <ClCompile Include="DwmColorLibrary.cpp">
+      <Filter>公共的类\DwmColorLibrary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

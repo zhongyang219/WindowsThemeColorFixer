@@ -6,7 +6,6 @@ public:
 	~CCommon();
 
 	static COLORREF GetWindowsThemeColor();
-
     static bool SetWindowsThemeColor(COLORREF color);
 
     //当前是否启动“从我的背景自动选取一种主题色”

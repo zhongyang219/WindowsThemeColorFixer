@@ -31,17 +31,14 @@ COLORREF CCommon::GetWindowsThemeColor()
 
 bool CCommon::SetWindowsThemeColor(COLORREF color)
 {
-    //CRegKey key;
-    //if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
-    //{
-    //    DWORD accent_color{ 0xff000000 | color };
-    //    if (key.SetDWORDValue(_T("AccentColor"), accent_color) == ERROR_SUCCESS)
-    //        return true;
-    //}
-    //return false;
-    WindowsThemeColorApi::SetDwmColorizationColor(color);
-    WindowsThemeColorApi::SetAccentColor(color);
-    return true;
+    CRegKey key;
+    if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
+    {
+        DWORD accent_color{ 0xff000000 | color };
+        if (key.SetDWORDValue(_T("AccentColor"), accent_color) == ERROR_SUCCESS)
+            return true;
+    }
+    return false;
 }
 
 

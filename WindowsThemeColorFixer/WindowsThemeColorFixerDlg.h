@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "DwmColorLibrary.h"
 
 // CWindowsThemeColorFixerDlg 对话框
 class CWindowsThemeColorFixerDlg : public CDialog
@@ -28,6 +28,8 @@ protected:
 	bool m_auto_adjust_color{ true };
     bool m_hide_main_window_when_start{ false };
     bool m_adjust_only_light_mode{ false };
+    bool m_enhanced_mode{ false };
+    CDwmColorLibrary m_dwm_lib;
 
     NOTIFYICONDATA m_ntIcon;	//通知区域图标
     CMenu m_menu;
@@ -39,6 +41,9 @@ protected:
 
     bool AdjustWindowsThemeColor();
     void SetOpaque(int opaque);     //设置不透明度
+
+    COLORREF GetThemeColor();
+    void SetThemeColor(COLORREF color);
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
@@ -68,4 +73,5 @@ public:
     afx_msg BOOL OnQueryEndSession();
     afx_msg void OnBnClickedAutoRunCheck();
     afx_msg void OnBnClickedAdjustOnlyLightModeCheck();
+    afx_msg void OnBnClickedEnhancedCheck();
 };
