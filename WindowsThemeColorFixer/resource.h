@@ -16,6 +16,7 @@
 #define IDC_HIDE_MAIN_WINDOW_CHECK      1004
 #define IDC_STATIC_VERSION              1005
 #define IDC_STATIC_COPYRIGHT            1006
+#define IDC_ADJUST_ONLY_LIGHT_MODE_CHECK 1007
 #define ID_SETTINGS                     32771
 #define ID_1_32772                      32772
 #define ID_MENU_EXIT                    32773
@@ -26,7 +27,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32774
-#define _APS_NEXT_CONTROL_VALUE         1007
+#define _APS_NEXT_CONTROL_VALUE         1008
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

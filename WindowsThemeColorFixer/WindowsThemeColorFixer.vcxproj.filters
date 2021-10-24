@@ -22,8 +22,8 @@
     <Filter Include="公共的类\Common">
       <UniqueIdentifier>{e4ff66ed-5424-47b6-abe3-5d050e978e33}</UniqueIdentifier>
     </Filter>
-    <Filter Include="公共的类\DwmColorLibrary">
-      <UniqueIdentifier>{e3f62085-473f-4ecd-8ead-222d5dd41631}</UniqueIdentifier>
+    <Filter Include="公共的类\WindowsThemeColorApi">
+      <UniqueIdentifier>{d37996ae-2b5d-4c63-8638-a90256031299}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,8 +48,8 @@
     <ClInclude Include="ColorConvert.h">
       <Filter>公共的类\ColorConvert</Filter>
     </ClInclude>
-    <ClInclude Include="DwmColorLibrary.h">
-      <Filter>公共的类\DwmColorLibrary</Filter>
+    <ClInclude Include="WindowsThemeColorApi.h">
+      <Filter>公共的类\WindowsThemeColorApi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,8 +68,8 @@
     <ClCompile Include="ColorConvert.cpp">
       <Filter>公共的类\ColorConvert</Filter>
     </ClCompile>
-    <ClCompile Include="DwmColorLibrary.cpp">
-      <Filter>公共的类\DwmColorLibrary</Filter>
+    <ClCompile Include="WindowsThemeColorApi.cpp">
+      <Filter>公共的类\WindowsThemeColorApi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

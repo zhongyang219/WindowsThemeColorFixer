@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#include "DwmColorLibrary.h"
 
 
 // CWindowsThemeColorFixerDlg 对话框
@@ -28,7 +27,7 @@ protected:
 
 	bool m_auto_adjust_color{ true };
     bool m_hide_main_window_when_start{ false };
-	CDwmColorLibrary m_themeColorLib;
+    bool m_adjust_only_light_mode{ false };
 
     NOTIFYICONDATA m_ntIcon;	//通知区域图标
     CMenu m_menu;
@@ -68,4 +67,5 @@ public:
     afx_msg void OnBnClickedHideMainWindowCheck();
     afx_msg BOOL OnQueryEndSession();
     afx_msg void OnBnClickedAutoRunCheck();
+    afx_msg void OnBnClickedAdjustOnlyLightModeCheck();
 };

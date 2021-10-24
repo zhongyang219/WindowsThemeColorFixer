@@ -1,5 +1,6 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Common.h"
+#include "WindowsThemeColorApi.h"
 
 
 CCommon::CCommon()
@@ -28,61 +29,21 @@ COLORREF CCommon::GetWindowsThemeColor()
 	return theme_color;
 }
 
-bool CCommon::SetAccentColor(COLORREF color)
+bool CCommon::SetWindowsThemeColor(COLORREF color)
 {
-    CRegKey key;
-    if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
-    {
-        DWORD accent_color{ 0xff000000 | color };
-        if (key.SetDWORDValue(_T("AccentColor"), accent_color) == ERROR_SUCCESS)
-            return true;
-    }
-    return false;
+    //CRegKey key;
+    //if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
+    //{
+    //    DWORD accent_color{ 0xff000000 | color };
+    //    if (key.SetDWORDValue(_T("AccentColor"), accent_color) == ERROR_SUCCESS)
+    //        return true;
+    //}
+    //return false;
+    WindowsThemeColorApi::SetDwmColorizationColor(color);
+    WindowsThemeColorApi::SetAccentColor(color);
+    return true;
 }
 
-//bool CCommon::SetColorizationColor(COLORREF color)
-//{
-//    CRegKey key;
-//    if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
-//    {
-//        DWORD colorization_color{};
-//        BYTE r, g, b;
-//        r = GetRValue(color);
-//        g = GetGValue(color);
-//        b = GetBValue(color);
-//
-//        colorization_color = (r << 16);
-//        colorization_color |= (g << 8);
-//        colorization_color |= b;
-//
-//        if (key.SetDWORDValue(_T("ColorizationColor"), colorization_color) == ERROR_SUCCESS)
-//            return true;
-//    }
-//    return false;
-//
-//}
-//
-//bool CCommon::SetColorizationAfterglow(COLORREF color)
-//{
-//    CRegKey key;
-//    if (key.Open(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\DWM")) == ERROR_SUCCESS)
-//    {
-//        DWORD colorization_color{};
-//        BYTE r, g, b;
-//        r = GetRValue(color);
-//        g = GetGValue(color);
-//        b = GetBValue(color);
-//
-//        colorization_color = (r << 16);
-//        colorization_color |= (g << 8);
-//        colorization_color |= b;
-//        colorization_color |= 0xc4000000;
-//
-//        if (key.SetDWORDValue(_T("ColorizationAfterglow"), colorization_color) == ERROR_SUCCESS)
-//            return true;
-//    }
-//    return false;
-//}
 
 bool CCommon::IsAutoColor()
 {
@@ -119,12 +80,25 @@ DWORD CCommon::COLORREFToDWColor(COLORREF color)
     return dw_color;
 }
 
-//void CCommon::SetWindowsThemeColor(COLORREF color)
-//{
-//	//DWORD crColorization;
-//	//BOOL fOpaqueBlend;
-//	//COLORREF theme_color{};
-//	//HRESULT result = DwmSetColorizationColor(&crColorization, &fOpaqueBlend);
-//	//DwmSet
-//
-//}
+bool CCommon::IsSystemLightTheme()
+{
+    return GetRegisgerDWordValue(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"), _T("SystemUsesLightTheme")) != 0;
+ }
+
+bool CCommon::IsAppLightTheme()
+{
+    return GetRegisgerDWordValue(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"), _T("AppsUseLightTheme")) != 0;
+}
+
+DWORD CCommon::GetRegisgerDWordValue(LPCTSTR path, LPCTSTR item_name)
+{
+    CRegKey key;
+    if (key.Open(HKEY_CURRENT_USER, path) == ERROR_SUCCESS)
+    {
+        DWORD data{};
+        if (key.QueryDWORDValue(item_name, data) == ERROR_SUCCESS)
+            return data;
+    }
+    return 0;
+
+}

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 class CCommon
 {
 public:
@@ -6,20 +6,18 @@ public:
 	~CCommon();
 
 	static COLORREF GetWindowsThemeColor();
-	//static void SetWindowsThemeColor(COLORREF color);
 
-    //ÉèÖÃWindowsµÄAccentColor£¬×¢Òâ£¬AccentColorµÄÖµÎªAABBGGRR£¬ºÍCOLORREFÀàĞÍ¼æÈİ
-    static bool SetAccentColor(COLORREF color);
+    static bool SetWindowsThemeColor(COLORREF color);
 
-    ////ÉèÖÃWindowsµÄColorizationColor£¬ColorizationColorµÄÖµÎªAARRGGBB£¬ºÍCOLORREFÀàĞÍµÄRºÍBÏà·´
-    //static bool SetColorizationColor(COLORREF color);
-
-    //static bool SetColorizationAfterglow(COLORREF color);
-
-    //µ±Ç°ÊÇ·ñÆô¶¯¡°´ÓÎÒµÄ±³¾°×Ô¶¯Ñ¡È¡Ò»ÖÖÖ÷ÌâÉ«¡±
+    //å½“å‰æ˜¯å¦å¯åŠ¨â€œä»æˆ‘çš„èƒŒæ™¯è‡ªåŠ¨é€‰å–ä¸€ç§ä¸»é¢˜è‰²â€
     static bool IsAutoColor();
 
     static COLORREF DWColorToCOLORREF(DWORD dwColor);
     static DWORD COLORREFToDWColor(COLORREF color);
-};
 
+    static bool IsSystemLightTheme();
+    static bool IsAppLightTheme();
+
+protected:
+    static DWORD GetRegisgerDWordValue(LPCTSTR path, LPCTSTR item_name);
+};

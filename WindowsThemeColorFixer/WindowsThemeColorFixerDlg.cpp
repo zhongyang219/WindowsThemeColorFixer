@@ -116,6 +116,7 @@ BEGIN_MESSAGE_MAP(CWindowsThemeColorFixerDlg, CDialog)
     ON_BN_CLICKED(IDC_HIDE_MAIN_WINDOW_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedHideMainWindowCheck)
     ON_WM_QUERYENDSESSION()
     ON_BN_CLICKED(IDC_AUTO_RUN_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedAutoRunCheck)
+    ON_BN_CLICKED(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedAdjustOnlyLightModeCheck)
 END_MESSAGE_MAP()
 
 
@@ -125,23 +126,28 @@ void CWindowsThemeColorFixerDlg::LoadConfig()
 {
     m_auto_adjust_color = (theApp.GetProfileInt(_T("config"), _T("auto_adjust_color"), 1) != 0);
     m_hide_main_window_when_start = (theApp.GetProfileInt(_T("config"), _T("hide_main_window_when_start"), 0) != 0);
+    m_adjust_only_light_mode = (theApp.GetProfileInt(_T("config"), _T("adjust_only_light_mode"), 0) != 0);
 }
 
 void CWindowsThemeColorFixerDlg::SaveConfig() const
 {
     theApp.WriteProfileInt(L"config", L"auto_adjust_color", m_auto_adjust_color);
     theApp.WriteProfileInt(L"config", L"hide_main_window_when_start", m_hide_main_window_when_start);
+    theApp.WriteProfileInt(L"config", L"adjust_only_light_mode", m_adjust_only_light_mode);
 }
 
 bool CWindowsThemeColorFixerDlg::AdjustWindowsThemeColor()
 {
-    COLORREF color = m_themeColorLib.GetWindowsThemeColor();
+    if (m_adjust_only_light_mode && !CCommon::IsAppLightTheme())
+        return false;
+
+    COLORREF color = CCommon::GetWindowsThemeColor();
     if (CColorConvert::IncreaseLuminance(color))
     {
-        m_themeColorLib.SetWindowsThemeColor(color);
-        CCommon::SetAccentColor(color);
+        CCommon::SetWindowsThemeColor(color);
         return true;
     }
+
     return false;
 }
 
@@ -188,6 +194,7 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
 	((CButton*)GetDlgItem(IDC_REDUCE_COLOR_CHECK))->SetCheck(m_auto_adjust_color);
 	((CButton*)GetDlgItem(IDC_HIDE_MAIN_WINDOW_CHECK))->SetCheck(m_hide_main_window_when_start);
 	((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->SetCheck(theApp.GetAutoRun());
+    CheckDlgButton(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, m_adjust_only_light_mode);
 #ifndef _DEBUG
     GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 #endif
@@ -306,7 +313,6 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
 void CWindowsThemeColorFixerDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	COLORREF color = m_themeColorLib.GetWindowsThemeColor();
     bool is_auto_color = CCommon::IsAutoColor();
 }
 
@@ -437,4 +443,11 @@ void CWindowsThemeColorFixerDlg::OnBnClickedAutoRunCheck()
     // TODO: 在此添加控件通知处理程序代码
     bool auto_run = (((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->GetCheck() != 0);
     theApp.SetAutoRun(auto_run);
+}
+
+
+void CWindowsThemeColorFixerDlg::OnBnClickedAdjustOnlyLightModeCheck()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    m_adjust_only_light_mode = (IsDlgButtonChecked(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK) != 0);
 }
