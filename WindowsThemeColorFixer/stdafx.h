@@ -58,6 +58,5 @@
 #define TIMER_ID_ADJUST_COLOR 1235
 
 #define APP_NAME L"WindowsThemeColorFixer"
-#define VERSION L"1.00"	//程序版本
-#define COMPILE_DATE L"2020/08/07"
-
+#define VERSION L"1.10"	//程序版本
+#define COMPILE_DATE L"2020/10/30"
