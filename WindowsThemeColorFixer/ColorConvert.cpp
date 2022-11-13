@@ -145,9 +145,9 @@ bool CColorConvert::IncreaseLuminance(COLORREF & color)
 	RGBtoHSL(&color_rgb, &color_hsl);		//将颜色从RGB模式转换成HSL模式
 
 	float luminance = color_hsl.luminance;		//保存原来的亮度
-	if (luminance < 24)						//当亮度小于一定值时增加颜色的亮度
+	if (luminance < 64)						//当亮度小于一定值时增加颜色的亮度
 	{
-		color_hsl.luminance = luminance * 0.2f + 50;
+		color_hsl.luminance = luminance * 0.1f + 50;
 		HSLtoRGB(&color_hsl, &color_rgb);
 		color = RGB(color_rgb.red, color_rgb.green, color_rgb.blue);
         return true;
