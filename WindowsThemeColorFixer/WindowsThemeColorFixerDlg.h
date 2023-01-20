@@ -26,6 +26,7 @@ protected:
 	HICON m_hIcon;
 
 	bool m_auto_adjust_color{ true };
+    bool m_waiting_for_adjust_color{ false };
     bool m_hide_main_window_when_start{ false };
     bool m_adjust_only_light_mode{ false };
     bool m_enhanced_mode{ false };

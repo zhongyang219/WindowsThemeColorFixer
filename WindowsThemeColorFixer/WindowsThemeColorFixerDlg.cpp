@@ -332,6 +332,7 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
     {
         AdjustWindowsThemeColor();
         KillTimer(TIMER_ID_ADJUST_COLOR);
+        m_waiting_for_adjust_color = false;
     }
 
 	CDialog::OnTimer(nIDEvent);
@@ -438,9 +439,16 @@ void CWindowsThemeColorFixerDlg::OnColorizationColorChanged(DWORD dwColorization
     // 此功能要求 Windows Vista 或更高版本。
     // _WIN32_WINNT 符号必须 >= 0x0600。
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-    if (m_auto_adjust_color)
+    static DWORD last_color{};
+    if (last_color != dwColorizationColor)
     {
-        SetTimer(TIMER_ID_ADJUST_COLOR, 100, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
+        if (m_auto_adjust_color && !m_waiting_for_adjust_color)
+        {
+            SetTimer(TIMER_ID_ADJUST_COLOR, 500, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
+            m_waiting_for_adjust_color = true;
+            OutputDebugString(_T("Theme color changed."));
+        }
+        last_color = dwColorizationColor;
     }
 
     CDialog::OnColorizationColorChanged(dwColorizationColor, bOpacity);
