@@ -444,9 +444,9 @@ void CWindowsThemeColorFixerDlg::OnColorizationColorChanged(DWORD dwColorization
     {
         if (m_auto_adjust_color && !m_waiting_for_adjust_color)
         {
-            SetTimer(TIMER_ID_ADJUST_COLOR, 500, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
+            SetTimer(TIMER_ID_ADJUST_COLOR, 2000, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
             m_waiting_for_adjust_color = true;
-            OutputDebugString(_T("Theme color changed."));
+            //OutputDebugString(_T("Theme color changed."));
         }
         last_color = dwColorizationColor;
     }
