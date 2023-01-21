@@ -42,6 +42,7 @@ protected:
 
     bool AdjustWindowsThemeColor();
     void SetOpaque(int opaque);     //设置不透明度
+    void StartAdjustWindosThemeColor();
 
     COLORREF GetThemeColor();
     void SetThemeColor(COLORREF color);

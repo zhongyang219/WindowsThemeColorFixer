@@ -161,6 +161,16 @@ void CWindowsThemeColorFixerDlg::SetOpaque(int opaque)
     SetLayeredWindowAttributes(0, opaque * 255 / 100, LWA_ALPHA);  //透明度取值范围为0~255
 }
 
+void CWindowsThemeColorFixerDlg::StartAdjustWindosThemeColor()
+{
+    if (m_auto_adjust_color && !m_waiting_for_adjust_color)
+    {
+        SetTimer(TIMER_ID_ADJUST_COLOR, 2000, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
+        m_waiting_for_adjust_color = true;
+        //OutputDebugString(_T("Theme color changed."));
+    }
+}
+
 COLORREF CWindowsThemeColorFixerDlg::GetThemeColor()
 {
     COLORREF color{};
@@ -243,8 +253,7 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
     m_ntIcon.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;	//图标的属性：设置成员uCallbackMessage、hIcon、szTip有效
     ::Shell_NotifyIcon(NIM_ADD, &m_ntIcon);	//在系统通知区域增加这个图标
 
-    if (m_auto_adjust_color)
-        AdjustWindowsThemeColor();
+    StartAdjustWindosThemeColor();
 
     if (m_hide_main_window_when_start)
         SetOpaque(0);
@@ -442,12 +451,7 @@ void CWindowsThemeColorFixerDlg::OnColorizationColorChanged(DWORD dwColorization
     static DWORD last_color{};
     if (last_color != dwColorizationColor)
     {
-        if (m_auto_adjust_color && !m_waiting_for_adjust_color)
-        {
-            SetTimer(TIMER_ID_ADJUST_COLOR, 2000, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
-            m_waiting_for_adjust_color = true;
-            //OutputDebugString(_T("Theme color changed."));
-        }
+        StartAdjustWindosThemeColor();
         last_color = dwColorizationColor;
     }
 
