@@ -87,6 +87,23 @@ bool CCommon::IsAppLightTheme()
     return GetRegisgerDWordValue(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"), _T("AppsUseLightTheme")) != 0;
 }
 
+static bool ColorValueSimilar(BYTE val1, BYTE val2)
+{
+    return std::abs(val1 - val2) < 16;
+}
+
+bool CCommon::IsColorSimilar(COLORREF color1, COLORREF color2)
+{
+    BYTE r1 = GetRValue(color1);
+    BYTE g1 = GetGValue(color1);
+    BYTE b1 = GetBValue(color1);
+    BYTE r2 = GetRValue(color2);
+    BYTE g2 = GetGValue(color2);
+    BYTE b2 = GetBValue(color2);
+
+    return ColorValueSimilar(r1, r2) && ColorValueSimilar(g1, g2) && ColorValueSimilar(b1, b2);
+}
+
 DWORD CCommon::GetRegisgerDWordValue(LPCTSTR path, LPCTSTR item_name)
 {
     CRegKey key;

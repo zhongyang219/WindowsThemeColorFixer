@@ -21,19 +21,19 @@
 class CAboutDlg : public CDialogEx
 {
 public:
-	CAboutDlg();
+    CAboutDlg();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
+    enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+    protected:
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 // 实现
 protected:
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 public:
     virtual BOOL OnInitDialog();
 };
@@ -44,7 +44,7 @@ CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
@@ -87,24 +87,24 @@ BOOL CAboutDlg::OnInitDialog()
 const UINT WM_TASKBARCREATED{ ::RegisterWindowMessage(_T("TaskbarCreated")) };	//注册任务栏建立的消息
 
 CWindowsThemeColorFixerDlg::CWindowsThemeColorFixerDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(IDD_WINDOWSTHEMECOLORFIXER_DIALOG, pParent)
+    : CDialog(IDD_WINDOWSTHEMECOLORFIXER_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+    m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void CWindowsThemeColorFixerDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+    CDialog::DoDataExchange(pDX);
 }
 
 BEGIN_MESSAGE_MAP(CWindowsThemeColorFixerDlg, CDialog)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_REDUCE_COLOR_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedReduceColorCheck)
-	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON1, &CWindowsThemeColorFixerDlg::OnBnClickedButton1)
-	//ON_BN_CLICKED(IDC_BUTTON2, &CWindowsThemeColorFixerDlg::OnBnClickedButton2)
+    ON_WM_SYSCOMMAND()
+    ON_WM_PAINT()
+    ON_WM_QUERYDRAGICON()
+    ON_BN_CLICKED(IDC_REDUCE_COLOR_CHECK, &CWindowsThemeColorFixerDlg::OnBnClickedReduceColorCheck)
+    ON_WM_TIMER()
+    ON_BN_CLICKED(IDC_BUTTON1, &CWindowsThemeColorFixerDlg::OnBnClickedButton1)
+    //ON_BN_CLICKED(IDC_BUTTON2, &CWindowsThemeColorFixerDlg::OnBnClickedButton2)
     ON_BN_CLICKED(IDC_ADJUST_COLOR_BUTTON, &CWindowsThemeColorFixerDlg::OnBnClickedAdjustColorButton)
     ON_COMMAND(ID_SETTINGS, &CWindowsThemeColorFixerDlg::OnSettings)
     ON_MESSAGE(WM_NOTIFYICON, &CWindowsThemeColorFixerDlg::OnNotifyicon)
@@ -183,54 +183,66 @@ COLORREF CWindowsThemeColorFixerDlg::GetThemeColor()
 
 void CWindowsThemeColorFixerDlg::SetThemeColor(COLORREF color)
 {
-    if (m_enhanced_mode)
+    static COLORREF last_theme_color = 0;
+    if (!CCommon::IsColorSimilar(color, last_theme_color))
     {
-        WindowsThemeColorApi::SetAccentColor(color);
+        if (m_enhanced_mode)
+        {
+            WindowsThemeColorApi::SetAccentColor(color);
+        }
+        else
+        {
+            m_dwm_lib.SetWindowsThemeColor(color);
+            CCommon::SetWindowsThemeColor(color);
+        }
+
+#ifdef DEBUG
+        //DEBUG模式下显示设置主题颜色的次数
+        static int count = 0;
+        count++;
+        SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(count).c_str());
+#endif // DEBUG
     }
-    else
-    {
-        m_dwm_lib.SetWindowsThemeColor(color);
-        CCommon::SetWindowsThemeColor(color);
-    }
+    last_theme_color = color;
 }
 
 BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+    CDialog::OnInitDialog();
 
-	// 将“关于...”菜单项添加到系统菜单中。
+    // 将“关于...”菜单项添加到系统菜单中。
 
-	// IDM_ABOUTBOX 必须在系统命令范围内。
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
+    // IDM_ABOUTBOX 必须在系统命令范围内。
+    ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+    ASSERT(IDM_ABOUTBOX < 0xF000);
 
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != nullptr)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
+    CMenu* pSysMenu = GetSystemMenu(FALSE);
+    if (pSysMenu != nullptr)
+    {
+        BOOL bNameValid;
+        CString strAboutMenu;
+        bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+        ASSERT(bNameValid);
+        if (!strAboutMenu.IsEmpty())
+        {
+            pSysMenu->AppendMenu(MF_SEPARATOR);
+            pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+        }
+    }
 
-	// 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
-	//  执行此操作
-	SetIcon(m_hIcon, TRUE);			// 设置大图标
-	SetIcon(m_hIcon, FALSE);		// 设置小图标
+    // 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
+    //  执行此操作
+    SetIcon(m_hIcon, TRUE);			// 设置大图标
+    SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+    // TODO: 在此添加额外的初始化代码
 
     LoadConfig();
 
     //初始化控件
-	((CButton*)GetDlgItem(IDC_REDUCE_COLOR_CHECK))->SetCheck(m_auto_adjust_color);
-	((CButton*)GetDlgItem(IDC_HIDE_MAIN_WINDOW_CHECK))->SetCheck(m_hide_main_window_when_start);
-	((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->SetCheck(theApp.GetAutoRun());
+    ((CButton*)GetDlgItem(IDC_REDUCE_COLOR_CHECK))->SetCheck(m_auto_adjust_color);
+    ((CButton*)GetDlgItem(IDC_HIDE_MAIN_WINDOW_CHECK))->SetCheck(m_hide_main_window_when_start);
+    ((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->SetCheck(theApp.GetAutoRun());
     CheckDlgButton(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, m_adjust_only_light_mode);
     CheckDlgButton(IDC_ENHANCED_CHECK, m_enhanced_mode);
 #ifndef _DEBUG
@@ -239,7 +251,7 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
 
     m_menu.LoadMenu(IDR_MENU1);
 
-	SetTimer(TIMER_ID, 1000, NULL);
+    SetTimer(TIMER_ID, 1000, NULL);
 
     m_ntIcon.cbSize = sizeof(NOTIFYICONDATA);	//该结构体变量的大小
     m_ntIcon.hIcon = m_hIcon;
@@ -258,20 +270,20 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
     if (m_hide_main_window_when_start)
         SetOpaque(0);
 
-	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+    return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
 void CWindowsThemeColorFixerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialog::OnSysCommand(nID, lParam);
-	}
+    if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+    {
+        CAboutDlg dlgAbout;
+        dlgAbout.DoModal();
+    }
+    else
+    {
+        CDialog::OnSysCommand(nID, lParam);
+    }
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
@@ -280,50 +292,50 @@ void CWindowsThemeColorFixerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CWindowsThemeColorFixerDlg::OnPaint()
 {
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // 用于绘制的设备上下文
+    if (IsIconic())
+    {
+        CPaintDC dc(this); // 用于绘制的设备上下文
 
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+        SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 使图标在工作区矩形中居中
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+        // 使图标在工作区矩形中居中
+        int cxIcon = GetSystemMetrics(SM_CXICON);
+        int cyIcon = GetSystemMetrics(SM_CYICON);
+        CRect rect;
+        GetClientRect(&rect);
+        int x = (rect.Width() - cxIcon + 1) / 2;
+        int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// 绘制图标
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialog::OnPaint();
-	}
+        // 绘制图标
+        dc.DrawIcon(x, y, m_hIcon);
+    }
+    else
+    {
+        CDialog::OnPaint();
+    }
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
 //显示。
 HCURSOR CWindowsThemeColorFixerDlg::OnQueryDragIcon()
 {
-	return static_cast<HCURSOR>(m_hIcon);
+    return static_cast<HCURSOR>(m_hIcon);
 }
 
 
 
 void CWindowsThemeColorFixerDlg::OnBnClickedReduceColorCheck()
 {
-	// TODO: 在此添加控件通知处理程序代码
-	m_auto_adjust_color = (((CButton*)GetDlgItem(IDC_REDUCE_COLOR_CHECK))->GetCheck() != 0);
+    // TODO: 在此添加控件通知处理程序代码
+    m_auto_adjust_color = (((CButton*)GetDlgItem(IDC_REDUCE_COLOR_CHECK))->GetCheck() != 0);
 }
 
 
 void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	if (nIDEvent == TIMER_ID)
-	{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    if (nIDEvent == TIMER_ID)
+    {
         if (m_first_start)
         {
             m_first_start = false;
@@ -331,11 +343,11 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
                 ShowWindow(SW_HIDE);
             SetOpaque(100);				//重新设置窗口不透明度
         }
-		if (m_auto_adjust_color)
-		{
+        if (m_auto_adjust_color)
+        {
             //AdjustWindowsThemeColor();
-		}
-	}
+        }
+    }
 
     if (nIDEvent == TIMER_ID_ADJUST_COLOR)
     {
@@ -344,13 +356,13 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
         m_waiting_for_adjust_color = false;
     }
 
-	CDialog::OnTimer(nIDEvent);
+    CDialog::OnTimer(nIDEvent);
 }
 
 
 void CWindowsThemeColorFixerDlg::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码
     bool is_auto_color = CCommon::IsAutoColor();
 }
 
@@ -449,11 +461,13 @@ void CWindowsThemeColorFixerDlg::OnColorizationColorChanged(DWORD dwColorization
     // _WIN32_WINNT 符号必须 >= 0x0600。
     // TODO: 在此添加消息处理程序代码和/或调用默认值
     static DWORD last_color{};
-    if (last_color != dwColorizationColor)
+    static DWORD last_last_color{};
+    if (!CCommon::IsColorSimilar(last_color, dwColorizationColor) && !CCommon::IsColorSimilar(last_last_color, dwColorizationColor))
     {
         StartAdjustWindosThemeColor();
-        last_color = dwColorizationColor;
     }
+    last_last_color = last_color;
+    last_color = dwColorizationColor;
 
     CDialog::OnColorizationColorChanged(dwColorizationColor, bOpacity);
 }

@@ -17,6 +17,8 @@ public:
     static bool IsSystemLightTheme();
     static bool IsAppLightTheme();
 
+    static bool IsColorSimilar(COLORREF color1, COLORREF color2);
+
 protected:
     static DWORD GetRegisgerDWordValue(LPCTSTR path, LPCTSTR item_name);
 };
