@@ -145,12 +145,17 @@ bool CWindowsThemeColorFixerDlg::AdjustWindowsThemeColor()
     if (m_adjust_only_light_mode && !CCommon::IsAppLightTheme())
         return false;
 
+    static COLORREF last_theme_color = 0;
     COLORREF color = GetThemeColor();
-    if (CColorConvert::IncreaseLuminance(color))
+    if (!CCommon::IsColorSimilar(last_theme_color, color))
     {
-        SetThemeColor(color);
-        return true;
+        if (CColorConvert::IncreaseLuminance(color))
+        {
+            SetThemeColor(color);
+            return true;
+        }
     }
+    last_theme_color = color;
 
     return false;
 }
@@ -183,27 +188,22 @@ COLORREF CWindowsThemeColorFixerDlg::GetThemeColor()
 
 void CWindowsThemeColorFixerDlg::SetThemeColor(COLORREF color)
 {
-    static COLORREF last_theme_color = 0;
-    if (!CCommon::IsColorSimilar(color, last_theme_color))
+    if (m_enhanced_mode)
     {
-        if (m_enhanced_mode)
-        {
-            WindowsThemeColorApi::SetAccentColor(color);
-        }
-        else
-        {
-            m_dwm_lib.SetWindowsThemeColor(color);
-            CCommon::SetWindowsThemeColor(color);
-        }
+        WindowsThemeColorApi::SetAccentColor(color);
+    }
+    else
+    {
+        m_dwm_lib.SetWindowsThemeColor(color);
+        CCommon::SetWindowsThemeColor(color);
+    }
 
 #ifdef DEBUG
-        //DEBUG模式下显示设置主题颜色的次数
-        static int count = 0;
-        count++;
-        SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(count).c_str());
+    //DEBUG模式下显示设置主题颜色的次数
+    static int count = 0;
+    count++;
+    SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(count).c_str());
 #endif // DEBUG
-    }
-    last_theme_color = color;
 }
 
 BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
