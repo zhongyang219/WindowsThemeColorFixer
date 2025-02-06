@@ -89,7 +89,7 @@ bool CCommon::IsAppLightTheme()
 
 static bool ColorValueSimilar(BYTE val1, BYTE val2)
 {
-    return std::abs(val1 - val2) < 16;
+    return std::abs(val1 - val2) < 4;
 }
 
 bool CCommon::IsColorSimilar(COLORREF color1, COLORREF color2)

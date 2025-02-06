@@ -26,7 +26,6 @@ protected:
 	HICON m_hIcon;
 
 	bool m_auto_adjust_color{ true };
-    bool m_waiting_for_adjust_color{ false };
     bool m_hide_main_window_when_start{ false };
     bool m_adjust_only_light_mode{ false };
     bool m_enhanced_mode{ false };
@@ -36,16 +35,19 @@ protected:
     CMenu m_menu;
 
     bool m_first_start{ true };		//初始时为true，在定时器第一次启动后置为flase
+    int m_color_adjust_count{};     //已调整颜色的次数
 
     void LoadConfig();
     void SaveConfig() const;
 
-    bool AdjustWindowsThemeColor();
     void SetOpaque(int opaque);     //设置不透明度
-    void StartAdjustWindosThemeColor();
 
     COLORREF GetThemeColor();
     void SetThemeColor(COLORREF color);
+    void DoAdjustThemeColor();
+
+    static UINT AdjustThemeColorThreadCallback(LPVOID dwUser);   //调整主题颜色的线程函数
+    bool m_adjust_color_required{ false };          //线程中需要调整主题颜色标志，当需要调整主题颜色时置为true，调整一次主题颜色时置为false
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();

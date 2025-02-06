@@ -140,40 +140,10 @@ void CWindowsThemeColorFixerDlg::SaveConfig() const
     theApp.WriteProfileInt(L"config", L"enhanced_mode", m_enhanced_mode);
 }
 
-bool CWindowsThemeColorFixerDlg::AdjustWindowsThemeColor()
-{
-    if (m_adjust_only_light_mode && !CCommon::IsAppLightTheme())
-        return false;
-
-    static COLORREF last_theme_color = 0;
-    COLORREF color = GetThemeColor();
-    if (!CCommon::IsColorSimilar(last_theme_color, color))
-    {
-        if (CColorConvert::IncreaseLuminance(color))
-        {
-            SetThemeColor(color);
-            return true;
-        }
-    }
-    last_theme_color = color;
-
-    return false;
-}
-
 void CWindowsThemeColorFixerDlg::SetOpaque(int opaque)
 {
     SetWindowLong(m_hWnd, GWL_EXSTYLE, GetWindowLong(m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
     SetLayeredWindowAttributes(0, opaque * 255 / 100, LWA_ALPHA);  //透明度取值范围为0~255
-}
-
-void CWindowsThemeColorFixerDlg::StartAdjustWindosThemeColor()
-{
-    if (m_auto_adjust_color && !m_waiting_for_adjust_color)
-    {
-        SetTimer(TIMER_ID_ADJUST_COLOR, 2000, NULL);     //由于系统主题色改变时，会多次收到此消息，因此延时一定时间再更改主题色
-        m_waiting_for_adjust_color = true;
-        //OutputDebugString(_T("Theme color changed."));
-    }
 }
 
 COLORREF CWindowsThemeColorFixerDlg::GetThemeColor()
@@ -200,10 +170,46 @@ void CWindowsThemeColorFixerDlg::SetThemeColor(COLORREF color)
 
 #ifdef DEBUG
     //DEBUG模式下显示设置主题颜色的次数
-    static int count = 0;
-    count++;
-    SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(count).c_str());
+    m_color_adjust_count++;
+    SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(m_color_adjust_count).c_str());
 #endif // DEBUG
+}
+
+void CWindowsThemeColorFixerDlg::DoAdjustThemeColor()
+{
+    if (m_auto_adjust_color)
+    {
+        if (m_adjust_only_light_mode && !CCommon::IsAppLightTheme())
+            return;
+
+        COLORREF color = GetThemeColor();
+        if (CColorConvert::IncreaseLuminance(color))
+        {
+            static COLORREF last_adjust_color;
+            if (!CCommon::IsColorSimilar(last_adjust_color, color))
+                SetThemeColor(color);
+            last_adjust_color = color;
+        }
+    }
+}
+
+UINT CWindowsThemeColorFixerDlg::AdjustThemeColorThreadCallback(LPVOID dwUser)
+{
+    CWindowsThemeColorFixerDlg* pThis = (CWindowsThemeColorFixerDlg*)dwUser;
+    while (true)
+    {
+        if (pThis->m_adjust_color_required)
+        {
+            Sleep(5000);    //先延迟一段时间
+            pThis->DoAdjustThemeColor();
+            pThis->m_adjust_color_required = false;
+        }
+        else
+        {
+            Sleep(1000);
+        }
+    }
+    return 0;
 }
 
 BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
@@ -265,7 +271,8 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
     m_ntIcon.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;	//图标的属性：设置成员uCallbackMessage、hIcon、szTip有效
     ::Shell_NotifyIcon(NIM_ADD, &m_ntIcon);	//在系统通知区域增加这个图标
 
-    StartAdjustWindosThemeColor();
+    m_adjust_color_required = true;
+    AfxBeginThread(AdjustThemeColorThreadCallback, (LPVOID)this);
 
     if (m_hide_main_window_when_start)
         SetOpaque(0);
@@ -349,13 +356,6 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
         }
     }
 
-    if (nIDEvent == TIMER_ID_ADJUST_COLOR)
-    {
-        AdjustWindowsThemeColor();
-        KillTimer(TIMER_ID_ADJUST_COLOR);
-        m_waiting_for_adjust_color = false;
-    }
-
     CDialog::OnTimer(nIDEvent);
 }
 
@@ -363,7 +363,11 @@ void CWindowsThemeColorFixerDlg::OnTimer(UINT_PTR nIDEvent)
 void CWindowsThemeColorFixerDlg::OnBnClickedButton1()
 {
     // TODO: 在此添加控件通知处理程序代码
-    bool is_auto_color = CCommon::IsAutoColor();
+    //bool is_auto_color = CCommon::IsAutoColor();
+
+    //重置调整主题颜色次数
+    m_color_adjust_count = 0;
+    SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(m_color_adjust_count).c_str());
 }
 
 
@@ -379,7 +383,11 @@ void CWindowsThemeColorFixerDlg::OnBnClickedButton1()
 void CWindowsThemeColorFixerDlg::OnBnClickedAdjustColorButton()
 {
     // TODO: 在此添加控件通知处理程序代码
-    AdjustWindowsThemeColor();
+    COLORREF color = GetThemeColor();
+    if (CColorConvert::IncreaseLuminance(color))
+    {
+        SetThemeColor(color);
+    }
 }
 
 
@@ -439,7 +447,6 @@ void CWindowsThemeColorFixerDlg::OnDestroy()
 {
     CDialog::OnDestroy();
 
-    // TODO: 在此处添加消息处理程序代码
     //程序退出时删除通知栏图标
     ::Shell_NotifyIcon(NIM_DELETE, &m_ntIcon);
 
@@ -464,7 +471,7 @@ void CWindowsThemeColorFixerDlg::OnColorizationColorChanged(DWORD dwColorization
     static DWORD last_last_color{};
     if (!CCommon::IsColorSimilar(last_color, dwColorizationColor) && !CCommon::IsColorSimilar(last_last_color, dwColorizationColor))
     {
-        StartAdjustWindosThemeColor();
+        m_adjust_color_required = true;
     }
     last_last_color = last_color;
     last_color = dwColorizationColor;
