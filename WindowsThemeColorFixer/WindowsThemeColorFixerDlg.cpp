@@ -168,11 +168,9 @@ void CWindowsThemeColorFixerDlg::SetThemeColor(COLORREF color)
         CCommon::SetWindowsThemeColor(color);
     }
 
-#ifdef DEBUG
-    //DEBUG模式下显示设置主题颜色的次数
+    //显示设置主题颜色的次数
     m_color_adjust_count++;
     SetDlgItemText(IDC_COUNT_STATIC, std::to_wstring(m_color_adjust_count).c_str());
-#endif // DEBUG
 }
 
 void CWindowsThemeColorFixerDlg::DoAdjustThemeColor()
@@ -251,9 +249,6 @@ BOOL CWindowsThemeColorFixerDlg::OnInitDialog()
     ((CButton*)GetDlgItem(IDC_AUTO_RUN_CHECK))->SetCheck(theApp.GetAutoRun());
     CheckDlgButton(IDC_ADJUST_ONLY_LIGHT_MODE_CHECK, m_adjust_only_light_mode);
     CheckDlgButton(IDC_ENHANCED_CHECK, m_enhanced_mode);
-#ifndef _DEBUG
-    GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
-#endif
 
     m_menu.LoadMenu(IDR_MENU1);
 

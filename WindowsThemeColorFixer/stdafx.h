@@ -57,5 +57,5 @@
 #define TIMER_ID 1234
 
 #define APP_NAME L"WindowsThemeColorFixer"
-#define VERSION L"1.11"	//程序版本
-#define COMPILE_DATE L"2025/02/06"
+#define VERSION L"1.12"	//程序版本
+#define COMPILE_DATE L"2025/02/07"

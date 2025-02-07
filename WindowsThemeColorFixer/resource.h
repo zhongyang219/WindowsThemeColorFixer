@@ -20,6 +20,7 @@
 #define IDC_CHECK2                      1008
 #define IDC_ENHANCED_CHECK              1008
 #define IDC_COUNT_STATIC                1009
+#define IDC_COUNT_STATIC2               1010
 #define ID_SETTINGS                     32771
 #define ID_1_32772                      32772
 #define ID_MENU_EXIT                    32773
